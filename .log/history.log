@@ -1,0 +1,2846 @@
+--[ 2019.10.01.10.17.08.610.0 ]--
+NewLogger: L01_FindTheOne
+Version: 1.3
+--[ 2019.10.01.10.17.08.642.0 ]--
+InitTree:
+/src/Neo.java
+/src/algs4.jar
+/src/stdlib.jar
+/src/Neo_Up.java
+/src/Neo_Down.java
+/src/Neo_Left.java
+/src/Neo_Right.java
+/src/FindTheOne.java
+/.log/history.log
+/.idea/copyright/profiles_settings.xml
+/.idea/libraries/algs4.xml
+/.idea/libraries/stdlib.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/compiler.xml
+/.idea/workspace.xml
+/.idea/uiDesigner.xml
+/.idea/description.html
+/.idea/project-template.xml
+/.cos265
+/readme.html
+/L01_FindTheOne.iml
+
+--[ 2019.10.01.10.17.08.644.0 ]--
+InitFile: /src/Neo_Left.java
+public class Neo_Left extends Neo<Double> {
+    private double d1;
+
+    public Neo_Left() {
+        d1 = StdRandom.uniform(0.0, Double.MAX_VALUE);
+    }
+
+    public int get(Double d) throws Exception {
+        increaseCalls();
+        if(d < d1) return 0;
+        return 1;
+    }
+    public void found1(Double d) throws Exception {
+        this.foundCalled();
+        double diff = Math.floor(d - d1);
+        if(Double.compare(diff, 0.0) == 0) {
+            StdOut.println("Perfect!");
+        } else {
+            StdOut.println("You are off by " + Math.abs(diff));
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.10.01.10.17.08.647.0 ]--
+InitFile: /src/Neo_Right.java
+import java.math.BigInteger;
+
+public class Neo_Right extends Neo<BigInteger> {
+    private static final double pStart = 0.9999;
+    private static final double pDecay = 0.9999;
+    private static final BigInteger [] singles = {
+            new BigInteger("0"),
+            new BigInteger("1"),
+            new BigInteger("2"),
+            new BigInteger("3"),
+            new BigInteger("4"),
+            new BigInteger("5"),
+            new BigInteger("6"),
+            new BigInteger("7"),
+            new BigInteger("8"),
+            new BigInteger("9"),
+    };
+
+    private BigInteger i1 = BigInteger.ZERO;
+
+    public Neo_Right() {
+        for(double p = pStart; StdRandom.uniform() < p; p *= pDecay) {
+            i1 = i1.multiply(BigInteger.TEN).add(singles[StdRandom.uniform(10)]);
+        }
+        if(StdRandom.uniform() < 0.5) i1 = i1.negate();
+    }
+
+    public int get(BigInteger i) throws Exception {
+        increaseCalls();
+        if(i.compareTo(i1) < 0) return 0;
+        return 1;
+    }
+
+    public void found1(BigInteger i) throws Exception {
+        foundCalled();
+        if(i.equals(i1)) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.10.01.10.17.08.650.0 ]--
+InitFile: /src/Neo.java
+public abstract class Neo<ValType> {
+    private int calls = 0;
+    private boolean foundcalled = false;
+
+    protected void increaseCalls() throws Exception {
+        if(foundcalled) throw new Exception("Cannot check after found is called!");
+        calls++;
+    }
+
+    protected void foundCalled() throws Exception {
+        if(foundcalled) throw new Exception("Cannot check after found is called!");
+        foundcalled = true;
+    }
+
+    protected int callsCount() {
+        return calls;
+    }
+
+    public abstract int get(ValType i) throws Exception;
+    public abstract void found1(ValType i) throws Exception;
+}
+
+--[ 2019.10.01.10.17.08.652.0 ]--
+InitFile: /L01_FindTheOne.iml
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="algs4" level="project" />
+    <orderEntry type="library" name="stdlib" level="project" />
+  </component>
+</module>
+
+--[ 2019.10.01.10.17.08.655.0 ]--
+InitFile: /src/Neo_Down.java
+public class Neo_Down extends Neo<Integer> {
+    private int i1;
+
+    public Neo_Down() {
+        i1 = StdRandom.uniform(Integer.MAX_VALUE);
+    }
+
+    public int get(Integer i) throws Exception {
+        increaseCalls();
+        if(i < 0) throw new IndexOutOfBoundsException();
+        if(i < i1) return 0;
+        return 1;
+    }
+
+    public void found1(Integer i) throws Exception {
+        foundCalled();
+        if(i == i1) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.10.01.10.17.08.657.0 ]--
+InitFile: /.cos265
+
+
+--[ 2019.10.01.10.17.08.658.0 ]--
+InitFile: /src/FindTheOne.java
+import java.math.BigInteger;
+
+public class FindTheOne {
+    private static void neo_up_naive() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            int i = 0;
+            while(neo.get(i) == 0) i++; // keep incrementing until
+                                        // we find the first 1!
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_up_bad() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            neo.found1(0);  // this is not the correct position!
+            neo.found1(0);  // this is will throw an exception!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_up() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            // do the tests here!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_down() {
+        StdRandom.setSeed(42);
+        Neo_Down neo = new Neo_Down();
+        try {
+            // do the tests here!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_left() {
+        StdRandom.setSeed(42);
+        Neo_Left neo = new Neo_Left();
+        try {
+            // do the tests here!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_right() {
+        StdRandom.setSeed(42);
+        Neo_Right neo = new Neo_Right();
+        try {
+            // do the tests here!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    public static void main(String[] args) {
+        neo_up_naive();
+        neo_up_bad();
+        neo_up();
+        neo_down();
+        neo_left();
+        neo_right();
+    }
+}
+
+--[ 2019.10.01.10.17.08.658.1 ]--
+InitFile: /src/Neo_Up.java
+public class Neo_Up extends Neo<Integer> {
+    private int N;
+    private int i1;
+
+    public Neo_Up() {
+        N = StdRandom.uniform(1, 1000000);
+        i1 = StdRandom.uniform(N);
+    }
+
+    public int size() {
+        return N;
+    }
+
+    public int get(Integer i) throws Exception {
+        increaseCalls();
+        if(i < 0 || i >= N) throw new IndexOutOfBoundsException();
+        if(i < i1) return 0;
+        return 1;
+    }
+
+    public void found1(Integer i) throws Exception {
+        foundCalled();
+        if(i == i1) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.10.01.10.23.37.712.0 ]--
+:/src/FindTheOne.java
+r 32             neo
+--[ 2019.10.01.10.23.38.853.0 ]--
+r 32             neo.
+--[ 2019.10.01.10.23.39.472.0 ]--
+r 32             neo.g
+--[ 2019.10.01.10.23.39.573.0 ]--
+r 32             neo.ge
+--[ 2019.10.01.10.23.39.745.0 ]--
+r 32             neo.get
+--[ 2019.10.01.10.23.40.532.0 ]--
+r 32             neo.get()
+--[ 2019.10.01.10.23.40.724.0 ]--
+r 32             neo.get(i)
+--[ 2019.10.01.10.23.50.558.0 ]--
++ 32             
+--[ 2019.10.01.10.23.51.655.0 ]--
+r 32             i
+--[ 2019.10.01.10.23.51.809.0 ]--
+r 32             in
+--[ 2019.10.01.10.23.52.027.0 ]--
+r 32             int
+--[ 2019.10.01.10.23.52.567.0 ]--
+r 32             int 
+--[ 2019.10.01.10.23.52.712.0 ]--
+r 32             int i
+--[ 2019.10.01.10.23.54.601.0 ]--
+r 32             int i 
+--[ 2019.10.01.10.23.56.056.0 ]--
+r 32             int i =
+--[ 2019.10.01.10.26.26.872.0 ]--
+r 32             int i = 
+--[ 2019.10.01.10.26.27.194.0 ]--
+r 32             int i = N
+--[ 2019.10.01.10.26.27.919.0 ]--
+r 32             int i = N/
+--[ 2019.10.01.10.26.29.359.0 ]--
+r 32             int i = N/2
+--[ 2019.10.01.10.26.29.553.0 ]--
+r 32             int i = N/2;
+--[ 2019.10.01.10.26.44.561.0 ]--
+r 32             int i = nN/2;
+--[ 2019.10.01.10.26.44.675.0 ]--
+r 32             int i = neN/2;
+--[ 2019.10.01.10.26.44.773.0 ]--
+r 32             int i = neoN/2;
+--[ 2019.10.01.10.26.45.193.0 ]--
+r 32             int i = neo.N/2;
+--[ 2019.10.01.10.27.10.383.0 ]--
+r 33             neo.get(i);
+--[ 2019.10.01.10.27.28.025.0 ]--
+r 32             int i = neo./2;
+--[ 2019.10.01.10.27.28.110.0 ]--
+r 32             int i = neo/2;
+--[ 2019.10.01.10.27.28.234.0 ]--
+r 32             int i = ne/2;
+--[ 2019.10.01.10.27.28.409.0 ]--
+r 32             int i = n/2;
+--[ 2019.10.01.10.27.28.778.0 ]--
+r 32             int i = /2;
+--[ 2019.10.01.10.27.29.325.0 ]--
+r 32             int i = s/2;
+--[ 2019.10.01.10.27.29.453.0 ]--
+r 32             int i = si/2;
+--[ 2019.10.01.10.27.29.832.0 ]--
+r 32             int i = siz/2;
+--[ 2019.10.01.10.27.29.998.0 ]--
+r 32             int i = size/2;
+--[ 2019.10.01.10.27.30.458.0 ]--
+r 32             int i = size(/2;
+--[ 2019.10.01.10.27.30.632.0 ]--
+r 32             int i = size()/2;
+--[ 2019.10.01.10.27.37.240.0 ]--
+r 32             int i = nsize()/2;
+--[ 2019.10.01.10.27.37.345.0 ]--
+r 32             int i = nesize()/2;
+--[ 2019.10.01.10.27.37.411.0 ]--
+r 32             int i = neosize()/2;
+--[ 2019.10.01.10.27.37.700.0 ]--
+r 32             int i = neo.size()/2;
+--[ 2019.10.01.10.28.09.857.0 ]--
++ 32             
+--[ 2019.10.01.10.28.10.364.0 ]--
+r 32             w
+--[ 2019.10.01.10.28.10.651.0 ]--
+r 32             whi
+--[ 2019.10.01.10.28.10.722.0 ]--
+r 32             whil
+--[ 2019.10.01.10.28.10.806.0 ]--
+r 32             while
+--[ 2019.10.01.10.28.12.401.0 ]--
+r 32             while()
+--[ 2019.10.01.10.28.14.524.0 ]--
+r 32             while(i)
+--[ 2019.10.01.10.28.17.888.0 ]--
+r 32             while(i!)
+--[ 2019.10.01.10.28.19.169.0 ]--
+r 32             while(i)
+--[ 2019.10.01.10.28.19.367.0 ]--
+r 32             while()
+--[ 2019.10.01.10.28.21.097.0 ]--
+r 32             while(n)
+--[ 2019.10.01.10.28.21.213.0 ]--
+r 32             while(ne)
+--[ 2019.10.01.10.28.21.308.0 ]--
+r 32             while(neo)
+--[ 2019.10.01.10.28.21.540.0 ]--
+r 32             while(neo.)
+--[ 2019.10.01.10.28.22.629.0 ]--
+r 32             while(neo.g)
+--[ 2019.10.01.10.28.22.737.0 ]--
+r 32             while(neo.ge)
+--[ 2019.10.01.10.28.22.871.0 ]--
+r 32             while(neo.get)
+--[ 2019.10.01.10.28.24.160.0 ]--
+r 32             while(neo.get())
+--[ 2019.10.01.10.28.25.132.0 ]--
+r 32             while(neo.get(i))
+--[ 2019.10.01.10.28.58.528.0 ]--
+r 32             while()
+--[ 2019.10.01.10.28.58.710.0 ]--
+r 32             while(i!)
+--[ 2019.10.01.10.28.59.152.0 ]--
+r 32             
+--[ 2019.10.01.10.28.59.645.0 ]--
+- 32
+--[ 2019.10.01.10.29.34.134.0 ]--
+r 33             neo.get(i)
+--[ 2019.10.01.10.29.36.834.0 ]--
+r 33             ineo.get(i)
+--[ 2019.10.01.10.29.37.133.0 ]--
+r 33             ifneo.get(i)
+--[ 2019.10.01.10.29.37.257.0 ]--
+r 33             if neo.get(i)
+--[ 2019.10.01.10.29.39.561.0 ]--
+r 33             if neo.get(i) 
+--[ 2019.10.01.10.29.42.278.0 ]--
+r 33             if neo.get(i) =
+--[ 2019.10.01.10.29.42.452.0 ]--
+r 33             if neo.get(i) ==
+--[ 2019.10.01.10.29.44.956.0 ]--
+r 33             if neo.get(i) == 
+--[ 2019.10.01.10.29.45.095.0 ]--
+r 33             if neo.get(i) == 0
+--[ 2019.10.01.10.29.47.817.0 ]--
+r 33             if neo.get(i) == 0)
+--[ 2019.10.01.10.29.50.875.0 ]--
+r 33             if (neo.get(i) == 0)
+--[ 2019.10.01.10.29.53.207.0 ]--
+r 33             if (neo.get(i) == 0){
+--[ 2019.10.01.10.29.53.624.0 ]--
++ 34 
++ 35 }
+--[ 2019.10.01.10.29.53.725.0 ]--
+r 35             }
+--[ 2019.10.01.10.29.53.763.0 ]--
+r 34                 
+--[ 2019.10.01.10.30.48.915.0 ]--
+r 34 
+--[ 2019.10.01.10.31.24.100.0 ]--
++ 32             
+--[ 2019.10.01.10.31.24.999.0 ]--
+r 32             w
+--[ 2019.10.01.10.31.25.220.0 ]--
+r 32             wh
+--[ 2019.10.01.10.31.25.247.0 ]--
+r 32             whi
+--[ 2019.10.01.10.31.25.307.0 ]--
+r 32             whil
+--[ 2019.10.01.10.31.25.405.0 ]--
+r 32             while
+--[ 2019.10.01.10.31.26.579.0 ]--
+r 32             while()
+--[ 2019.10.01.10.31.27.997.0 ]--
+r 32             while(i)
+--[ 2019.10.01.10.31.28.694.0 ]--
+r 32             while(i )
+--[ 2019.10.01.10.31.29.093.0 ]--
+r 32             while(i !)
+--[ 2019.10.01.10.31.29.628.0 ]--
+r 32             while(i !=)
+--[ 2019.10.01.10.31.31.038.0 ]--
+r 32             while(i != )
+--[ 2019.10.01.10.31.31.342.0 ]--
+r 32             while(i != 1)
+--[ 2019.10.01.10.31.38.937.0 ]--
+r 31         try {i
+--[ 2019.10.01.10.31.39.048.0 ]--
+r 31         try {in
+--[ 2019.10.01.10.31.39.126.0 ]--
+r 31         try {int
+--[ 2019.10.01.10.31.40.081.0 ]--
+r 31         try {int 
+--[ 2019.10.01.10.31.41.005.0 ]--
+r 31         try {int i
+--[ 2019.10.01.10.31.43.220.0 ]--
++ 31         try {
+r 32             int i
+--[ 2019.10.01.10.31.49.619.0 ]--
+r 34             
+--[ 2019.10.01.10.31.51.000.0 ]--
+- 34
+--[ 2019.10.01.10.31.54.198.0 ]--
+r 32             int i = neo.size()/2;
+--[ 2019.10.01.10.32.00.900.0 ]--
+r 33             while(i != 1 )
+--[ 2019.10.01.10.32.02.616.0 ]--
+r 33             while(i != 1 &)
+--[ 2019.10.01.10.32.02.871.0 ]--
+r 33             while(i != 1 &&)
+--[ 2019.10.01.10.32.03.487.0 ]--
+r 33             while(i != 1 && )
+--[ 2019.10.01.10.32.12.092.0 ]--
+r 33             while(i != 1 &&)
+--[ 2019.10.01.10.32.12.283.0 ]--
+r 33             while(i != 1 &)
+--[ 2019.10.01.10.32.12.663.0 ]--
+r 33             while(i != 1 )
+--[ 2019.10.01.10.32.13.636.0 ]--
+r 33             while(i != 1 |)
+--[ 2019.10.01.10.32.13.816.0 ]--
+r 33             while(i != 1 ||)
+--[ 2019.10.01.10.32.15.299.0 ]--
+r 33             while(i != 1 || )
+--[ 2019.10.01.10.32.27.122.0 ]--
+r 33             while(i != 1 ||)
+--[ 2019.10.01.10.32.27.342.0 ]--
+r 33             while(i != 1 |)
+--[ 2019.10.01.10.32.29.014.0 ]--
+r 33             while(i != 1 )
+--[ 2019.10.01.10.32.30.280.0 ]--
+r 33             while(i != 1 &)
+--[ 2019.10.01.10.32.30.415.0 ]--
+r 33             while(i != 1 &&)
+--[ 2019.10.01.10.32.31.112.0 ]--
+r 33             while(i != 1 && )
+--[ 2019.10.01.10.32.31.667.0 ]--
+r 33             while(i != 1 && i)
+--[ 2019.10.01.10.32.32.559.0 ]--
+r 33             while(i != 1 && i-)
+--[ 2019.10.01.10.32.33.529.0 ]--
+r 33             while(i != 1 && i-1)
+--[ 2019.10.01.10.32.35.163.0 ]--
+r 33             while(i != 1 && i-1 )
+--[ 2019.10.01.10.32.36.184.0 ]--
+r 33             while(i != 1 && i-1 !)
+--[ 2019.10.01.10.32.37.616.0 ]--
+r 33             while(i != 1 && i-1 )
+--[ 2019.10.01.10.32.39.085.0 ]--
+r 33             while(i != 1 && i-1 !)
+--[ 2019.10.01.10.32.39.715.0 ]--
+r 33             while(i != 1 && i-1 !=)
+--[ 2019.10.01.10.32.42.300.0 ]--
+r 33             while(i != 1 && i-1 != )
+--[ 2019.10.01.10.32.42.420.0 ]--
+r 33             while(i != 1 && i-1 != 0)
+--[ 2019.10.01.10.32.46.677.0 ]--
+r 33             while(i != 1 && i-1 != 0 )
+--[ 2019.10.01.10.32.47.712.0 ]--
+r 33             while(i != 1 && i-1 != 0 &)
+--[ 2019.10.01.10.32.47.825.0 ]--
+r 33             while(i != 1 && i-1 != 0 &&)
+--[ 2019.10.01.10.32.48.220.0 ]--
+r 33             while(i != 1 && i-1 != 0 && )
+--[ 2019.10.01.10.32.48.993.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i)
+--[ 2019.10.01.10.32.49.753.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i+)
+--[ 2019.10.01.10.32.50.175.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i+1)
+--[ 2019.10.01.10.32.51.307.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i+1 )
+--[ 2019.10.01.10.32.52.885.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i+1 !)
+--[ 2019.10.01.10.32.53.302.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i+1 !=)
+--[ 2019.10.01.10.32.54.003.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i+1 != )
+--[ 2019.10.01.10.32.54.335.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i+1 != 1)
+--[ 2019.10.01.10.33.13.954.0 ]--
+r 33             while(i != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.33.15.035.0 ]--
++ 34 
++ 35 }
+--[ 2019.10.01.10.33.15.060.0 ]--
+r 35             }
+--[ 2019.10.01.10.33.15.093.0 ]--
+r 34                 
+--[ 2019.10.01.10.33.20.258.0 ]--
+r 34                 i
+--[ 2019.10.01.10.33.24.029.0 ]--
+r 34                 i 
+--[ 2019.10.01.10.33.24.161.0 ]--
+r 34                 i =
+--[ 2019.10.01.10.33.24.368.0 ]--
+r 34                 i = 
+--[ 2019.10.01.10.33.26.785.0 ]--
+r 34                 i = ()
+--[ 2019.10.01.10.33.28.868.0 ]--
+r 34                 i = (i)
+--[ 2019.10.01.10.33.29.923.0 ]--
+r 34                 i = (i+)
+--[ 2019.10.01.10.33.32.650.0 ]--
+r 34                 i = (i+n)
+--[ 2019.10.01.10.33.32.846.0 ]--
+r 34                 i = (i+ne)
+--[ 2019.10.01.10.33.32.910.0 ]--
+r 34                 i = (i+neo)
+--[ 2019.10.01.10.33.33.199.0 ]--
+r 34                 i = (i+neo.)
+--[ 2019.10.01.10.33.33.859.0 ]--
+r 34                 i = (i+neo.s)
+--[ 2019.10.01.10.33.33.972.0 ]--
+r 34                 i = (i+neo.si)
+--[ 2019.10.01.10.33.34.355.0 ]--
+r 34                 i = (i+neo.siz)
+--[ 2019.10.01.10.33.34.558.0 ]--
+r 34                 i = (i+neo.size)
+--[ 2019.10.01.10.33.35.369.0 ]--
+r 34                 i = (i+neo.size())
+--[ 2019.10.01.10.33.37.468.0 ]--
+r 34                 i = (i+neo.size()/)
+--[ 2019.10.01.10.33.38.026.0 ]--
+r 34                 i = (i+neo.size()/2)
+--[ 2019.10.01.10.33.39.030.0 ]--
+r 34                 i = (i+neo.size()/)
+--[ 2019.10.01.10.33.39.417.0 ]--
+r 34                 i = (i+neo.size())
+--[ 2019.10.01.10.33.41.821.0 ]--
+r 34                 i = (i+neo.size())/
+--[ 2019.10.01.10.33.42.053.0 ]--
+r 34                 i = (i+neo.size())/2
+--[ 2019.10.01.10.33.43.487.0 ]--
+r 34                 i = (i+neo.size())/2;
+--[ 2019.10.01.10.36.10.755.0 ]--
+r 33             while(ni != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.10.947.0 ]--
+r 33             while(nei != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.11.108.0 ]--
+r 33             while(neoi != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.12.447.0 ]--
+r 33             while(neo.i != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.12.979.0 ]--
+r 33             while(neo.gi != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.13.299.0 ]--
+r 33             while(neo.gei != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.13.446.0 ]--
+r 33             while(neo.geti != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.13.945.0 ]--
+r 33             while(neo.get(i != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.15.310.0 ]--
+r 33             while(neo.get(i) != 1 && i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.58.932.0 ]--
+r 33             while(neo.get(i) != 1 && ni-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.59.143.0 ]--
+r 33             while(neo.get(i) != 1 && nei-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.59.234.0 ]--
+r 33             while(neo.get(i) != 1 && neoi-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.36.59.728.0 ]--
+r 33             while(neo.get(i) != 1 && neo.i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.37.00.021.0 ]--
+r 33             while(neo.get(i) != 1 && neo.gi-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.37.00.177.0 ]--
+r 33             while(neo.get(i) != 1 && neo.gei-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.37.00.327.0 ]--
+r 33             while(neo.get(i) != 1 && neo.geti-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.37.00.813.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.37.02.492.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && i+1 != 1){
+--[ 2019.10.01.10.37.05.219.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && ni+1 != 1){
+--[ 2019.10.01.10.37.05.402.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && nei+1 != 1){
+--[ 2019.10.01.10.37.05.447.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && neoi+1 != 1){
+--[ 2019.10.01.10.37.06.055.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && neo.i+1 != 1){
+--[ 2019.10.01.10.37.06.301.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && neo.gi+1 != 1){
+--[ 2019.10.01.10.37.06.493.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && neo.gei+1 != 1){
+--[ 2019.10.01.10.37.06.642.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && neo.geti+1 != 1){
+--[ 2019.10.01.10.37.07.500.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && neo.get(i+1 != 1){
+--[ 2019.10.01.10.37.09.303.0 ]--
+r 33             while(neo.get(i) != 1 && neo.get(i)-1 != 0 && neo.get(i)+1 != 1){
+--[ 2019.10.01.10.37.22.970.0 ]--
+- 36
+- 36
+r 36             
+--[ 2019.10.01.10.37.23.291.0 ]--
+r 36             r
+--[ 2019.10.01.10.37.23.422.0 ]--
+r 36             re
+--[ 2019.10.01.10.37.23.656.0 ]--
+r 36             ret
+--[ 2019.10.01.10.37.23.810.0 ]--
+r 36             retu
+--[ 2019.10.01.10.37.23.925.0 ]--
+r 36             retur
+--[ 2019.10.01.10.37.24.023.0 ]--
+r 36             return
+--[ 2019.10.01.10.37.25.309.0 ]--
+r 36             return 
+--[ 2019.10.01.10.37.25.560.0 ]--
+r 36             return n
+--[ 2019.10.01.10.37.25.647.0 ]--
+r 36             return ne
+--[ 2019.10.01.10.37.26.865.0 ]--
+r 36             return ne]
+--[ 2019.10.01.10.37.27.052.0 ]--
+r 36             return ne]]
+--[ 2019.10.01.10.37.27.297.0 ]--
+r 36             return ne]]]
+--[ 2019.10.01.10.37.27.512.0 ]--
+r 36             return ne]]
+--[ 2019.10.01.10.37.27.742.0 ]--
+r 36             return ne]
+--[ 2019.10.01.10.37.27.912.0 ]--
+r 36             return ne
+--[ 2019.10.01.10.37.28.049.0 ]--
+r 36             return n
+--[ 2019.10.01.10.37.28.624.0 ]--
+r 36             return 
+--[ 2019.10.01.10.37.47.855.0 ]--
+r 36             return
+--[ 2019.10.01.10.37.47.991.0 ]--
+r 36             retur
+--[ 2019.10.01.10.37.48.179.0 ]--
+r 36             retu
+--[ 2019.10.01.10.37.48.319.0 ]--
+r 36             ret
+--[ 2019.10.01.10.37.48.627.0 ]--
+r 36             re
+--[ 2019.10.01.10.37.48.802.0 ]--
+r 36             r
+--[ 2019.10.01.10.37.49.010.0 ]--
+r 36             
+--[ 2019.10.01.10.37.49.860.0 ]--
+r 36             n
+--[ 2019.10.01.10.37.50.047.0 ]--
+r 36             ne
+--[ 2019.10.01.10.37.50.088.0 ]--
+r 36             neo
+--[ 2019.10.01.10.37.50.592.0 ]--
+r 36             neo.
+--[ 2019.10.01.10.37.51.170.0 ]--
+r 36             neo.f
+--[ 2019.10.01.10.37.53.771.0 ]--
+r 36             neo.found1
+--[ 2019.10.01.10.37.53.812.0 ]--
+r 36             neo.found1()
+--[ 2019.10.01.10.37.53.827.0 ]--
+r 36             neo.found1();
+--[ 2019.10.01.10.37.54.926.0 ]--
+r 36             neo.found1(i);
+--[ 2019.10.01.10.38.56.449.0 ]--
++ 34                 
+--[ 2019.10.01.10.38.56.974.0 ]--
+r 34                 i
+--[ 2019.10.01.10.38.57.113.0 ]--
+r 34                 if
+--[ 2019.10.01.10.38.58.850.0 ]--
+r 34                 if 
+--[ 2019.10.01.10.38.59.035.0 ]--
+r 34                 if ()
+--[ 2019.10.01.10.39.00.022.0 ]--
+r 34                 if (n)
+--[ 2019.10.01.10.39.00.139.0 ]--
+r 34                 if (ne)
+--[ 2019.10.01.10.39.00.233.0 ]--
+r 34                 if (neo)
+--[ 2019.10.01.10.39.00.508.0 ]--
+r 34                 if (neo.)
+--[ 2019.10.01.10.39.01.242.0 ]--
+r 34                 if (neo.g)
+--[ 2019.10.01.10.39.01.380.0 ]--
+r 34                 if (neo.ge)
+--[ 2019.10.01.10.39.01.485.0 ]--
+r 34                 if (neo.get)
+--[ 2019.10.01.10.39.05.120.0 ]--
+r 34                 if (neo.get())
+--[ 2019.10.01.10.39.06.006.0 ]--
+r 34                 if (neo.get(i))
+--[ 2019.10.01.10.39.07.546.0 ]--
+r 34                 if (neo.get(i) )
+--[ 2019.10.01.10.39.07.625.0 ]--
+r 34                 if (neo.get(i) =)
+--[ 2019.10.01.10.39.07.714.0 ]--
+r 34                 if (neo.get(i) = )
+--[ 2019.10.01.10.39.08.649.0 ]--
+r 34                 if (neo.get(i) = 1)
+--[ 2019.10.01.10.39.13.852.0 ]--
+r 34                 if (neo.get(i) == 1)
+--[ 2019.10.01.10.39.16.162.0 ]--
+r 34                 if (neo.get(i) == 1){
+--[ 2019.10.01.10.39.16.633.0 ]--
++ 35 
++ 36 }
+--[ 2019.10.01.10.39.16.654.0 ]--
+r 36                 }
+--[ 2019.10.01.10.39.16.696.0 ]--
+r 35                     
+--[ 2019.10.01.10.39.54.502.0 ]--
++ 33             
+--[ 2019.10.01.10.39.55.743.0 ]--
+r 33             u
+--[ 2019.10.01.10.39.56.060.0 ]--
+r 33             up
+--[ 2019.10.01.10.39.56.178.0 ]--
+r 33             upp
+--[ 2019.10.01.10.39.56.901.0 ]--
+r 33             uppe
+--[ 2019.10.01.10.39.56.983.0 ]--
+r 33             upper
+--[ 2019.10.01.10.39.58.695.0 ]--
+r 33             uppe
+--[ 2019.10.01.10.39.58.823.0 ]--
+r 33             upp
+--[ 2019.10.01.10.39.58.990.0 ]--
+r 33             up
+--[ 2019.10.01.10.39.59.207.0 ]--
+r 33             u
+--[ 2019.10.01.10.39.59.583.0 ]--
+r 33             
+--[ 2019.10.01.10.40.00.177.0 ]--
+r 33             i
+--[ 2019.10.01.10.40.00.313.0 ]--
+r 33             in
+--[ 2019.10.01.10.40.00.424.0 ]--
+r 33             int
+--[ 2019.10.01.10.40.01.032.0 ]--
+r 33             int 
+--[ 2019.10.01.10.40.01.293.0 ]--
+r 33             int u
+--[ 2019.10.01.10.40.01.497.0 ]--
+r 33             int up
+--[ 2019.10.01.10.40.01.639.0 ]--
+r 33             int upp
+--[ 2019.10.01.10.40.01.845.0 ]--
+r 33             int uppe
+--[ 2019.10.01.10.40.01.945.0 ]--
+r 33             int upper
+--[ 2019.10.01.10.40.02.420.0 ]--
+r 33             int upperb
+--[ 2019.10.01.10.40.02.538.0 ]--
+r 33             int upperbo
+--[ 2019.10.01.10.40.02.823.0 ]--
+r 33             int upperbou
+--[ 2019.10.01.10.40.03.031.0 ]--
+r 33             int upperboun
+--[ 2019.10.01.10.40.03.255.0 ]--
+r 33             int upperbound
+--[ 2019.10.01.10.40.04.373.0 ]--
+r 33             int upperbound 
+--[ 2019.10.01.10.40.04.464.0 ]--
+r 33             int upperbound =
+--[ 2019.10.01.10.40.04.650.0 ]--
+r 33             int upperbound = 
+--[ 2019.10.01.10.40.06.497.0 ]--
+r 33             int upperbound = n
+--[ 2019.10.01.10.40.06.615.0 ]--
+r 33             int upperbound = ne
+--[ 2019.10.01.10.40.06.729.0 ]--
+r 33             int upperbound = neo
+--[ 2019.10.01.10.40.07.114.0 ]--
+r 33             int upperbound = neo.
+--[ 2019.10.01.10.40.08.043.0 ]--
+r 33             int upperbound = neo.s
+--[ 2019.10.01.10.40.08.207.0 ]--
+r 33             int upperbound = neo.si
+--[ 2019.10.01.10.40.08.412.0 ]--
+r 33             int upperbound = neo.siz
+--[ 2019.10.01.10.40.08.705.0 ]--
+r 33             int upperbound = neo.size
+--[ 2019.10.01.10.40.09.669.0 ]--
+r 33             int upperbound = neo.size;
+--[ 2019.10.01.10.40.10.356.0 ]--
++ 34             
+--[ 2019.10.01.10.40.11.777.0 ]--
+- 34
+--[ 2019.10.01.10.40.12.242.0 ]--
+r 33             int upperbound = neo.size
+--[ 2019.10.01.10.40.13.112.0 ]--
+r 33             int upperbound = neo.size()
+--[ 2019.10.01.10.40.13.917.0 ]--
+r 33             int upperbound = neo.size();
+--[ 2019.10.01.10.40.14.210.0 ]--
++ 34             
+--[ 2019.10.01.10.40.15.781.0 ]--
+r 34             i
+--[ 2019.10.01.10.40.15.925.0 ]--
+r 34             in
+--[ 2019.10.01.10.40.16.519.0 ]--
+r 34             int
+--[ 2019.10.01.10.40.17.077.0 ]--
+r 34             int 
+--[ 2019.10.01.10.40.17.909.0 ]--
+r 34             int l
+--[ 2019.10.01.10.40.18.054.0 ]--
+r 34             int lo
+--[ 2019.10.01.10.40.18.474.0 ]--
+r 34             int low
+--[ 2019.10.01.10.40.18.553.0 ]--
+r 34             int lowe
+--[ 2019.10.01.10.40.18.701.0 ]--
+r 34             int lower
+--[ 2019.10.01.10.40.19.856.0 ]--
+r 34             int lowerb
+--[ 2019.10.01.10.40.19.940.0 ]--
+r 34             int lowerbo
+--[ 2019.10.01.10.40.20.077.0 ]--
+r 34             int lowerbou
+--[ 2019.10.01.10.40.20.262.0 ]--
+r 34             int lowerboun
+--[ 2019.10.01.10.40.20.488.0 ]--
+r 34             int lowerbound
+--[ 2019.10.01.10.40.21.649.0 ]--
+r 34             int lowerbound 
+--[ 2019.10.01.10.40.22.556.0 ]--
+r 34             int lowerbound =
+--[ 2019.10.01.10.40.22.641.0 ]--
+r 34             int lowerbound = 
+--[ 2019.10.01.10.40.25.136.0 ]--
+r 34             int lowerbound = 0
+--[ 2019.10.01.10.40.25.441.0 ]--
+r 34             int lowerbound = 0;
+--[ 2019.10.01.10.40.41.118.0 ]--
++ 37                     
+--[ 2019.10.01.10.41.17.999.0 ]--
++ 33             
+--[ 2019.10.01.10.41.19.970.0 ]--
+r 33             i
+--[ 2019.10.01.10.41.20.179.0 ]--
+r 33             in
+--[ 2019.10.01.10.41.20.336.0 ]--
+r 33             int
+--[ 2019.10.01.10.41.21.673.0 ]--
+r 33             in
+--[ 2019.10.01.10.41.21.965.0 ]--
+r 33             i
+--[ 2019.10.01.10.41.22.140.0 ]--
+r 33             
+--[ 2019.10.01.10.41.22.354.0 ]--
+- 33
+--[ 2019.10.01.10.41.30.948.0 ]--
+r 37                     l
+--[ 2019.10.01.10.41.31.055.0 ]--
+r 37                     lo
+--[ 2019.10.01.10.41.31.238.0 ]--
+r 37                     low
+--[ 2019.10.01.10.41.31.311.0 ]--
+r 37                     lowe
+--[ 2019.10.01.10.41.31.486.0 ]--
+r 37                     lower
+--[ 2019.10.01.10.41.32.646.0 ]--
+r 37                     lowerbound
+--[ 2019.10.01.10.41.34.370.0 ]--
+r 37                     lowerbound 
+--[ 2019.10.01.10.41.34.466.0 ]--
+r 37                     lowerbound =
+--[ 2019.10.01.10.41.34.615.0 ]--
+r 37                     lowerbound = 
+--[ 2019.10.01.10.41.40.052.0 ]--
+r 37                     lowerbound = ()
+--[ 2019.10.01.10.41.56.888.0 ]--
+r 37                     u = ()
+--[ 2019.10.01.10.41.57.012.0 ]--
+r 37                     up = ()
+--[ 2019.10.01.10.41.57.214.0 ]--
+r 37                     upp = ()
+--[ 2019.10.01.10.41.58.057.0 ]--
+r 37                     upperbound = ()
+--[ 2019.10.01.10.41.59.340.0 ]--
+r 37                     upperbound= ()
+--[ 2019.10.01.10.41.59.567.0 ]--
+r 37                     upperbound ()
+--[ 2019.10.01.10.41.59.761.0 ]--
+r 37                     upperbound()
+--[ 2019.10.01.10.41.59.920.0 ]--
+r 37                     upperbound)
+--[ 2019.10.01.10.42.00.086.0 ]--
+r 37                     upperbound
+--[ 2019.10.01.10.42.00.837.0 ]--
+r 37                     upperbound 
+--[ 2019.10.01.10.42.01.132.0 ]--
+r 37                     upperbound =
+--[ 2019.10.01.10.42.01.278.0 ]--
+r 37                     upperbound ==
+--[ 2019.10.01.10.42.01.373.0 ]--
+r 37                     upperbound == 
+--[ 2019.10.01.10.42.02.748.0 ]--
+r 37                     upperbound == i
+--[ 2019.10.01.10.42.03.819.0 ]--
+r 37                     upperbound == i;
+--[ 2019.10.01.10.42.04.810.0 ]--
++ 38                     
+--[ 2019.10.01.10.42.06.280.0 ]--
+- 38
+--[ 2019.10.01.10.42.34.372.0 ]--
++ 38                     
+--[ 2019.10.01.10.42.35.466.0 ]--
+r 38                     l
+--[ 2019.10.01.10.42.35.647.0 ]--
+r 38                     lo
+--[ 2019.10.01.10.42.35.786.0 ]--
+r 38                     low
+--[ 2019.10.01.10.42.35.898.0 ]--
+r 38                     lowe
+--[ 2019.10.01.10.42.36.048.0 ]--
+r 38                     lower
+--[ 2019.10.01.10.42.36.899.0 ]--
+r 38                     lowerbound
+--[ 2019.10.01.10.42.37.876.0 ]--
+r 38                     lowerbound 
+--[ 2019.10.01.10.42.38.164.0 ]--
+r 38                     lowerbound =
+--[ 2019.10.01.10.42.38.339.0 ]--
+r 38                     lowerbound = 
+--[ 2019.10.01.10.42.40.531.0 ]--
+r 37                     upperbound = i;
+--[ 2019.10.01.10.42.46.720.0 ]--
+r 38                     lowerbound = ()
+--[ 2019.10.01.10.42.48.480.0 ]--
+r 38                     lowerbound = (l)
+--[ 2019.10.01.10.42.48.741.0 ]--
+r 38                     lowerbound = (lo)
+--[ 2019.10.01.10.42.48.831.0 ]--
+r 38                     lowerbound = (low)
+--[ 2019.10.01.10.42.48.917.0 ]--
+r 38                     lowerbound = (lowe)
+--[ 2019.10.01.10.42.49.046.0 ]--
+r 38                     lowerbound = (lower)
+--[ 2019.10.01.10.42.50.028.0 ]--
+r 38                     lowerbound = (lowerbound)
+--[ 2019.10.01.10.42.52.149.0 ]--
+r 38                     lowerbound = (lowerbound+)
+--[ 2019.10.01.10.42.55.721.0 ]--
+r 38                     lowerbound = (lowerbound+i)
+--[ 2019.10.01.10.42.57.822.0 ]--
+r 38                     lowerbound = (lowerbound+i)/
+--[ 2019.10.01.10.42.57.956.0 ]--
+r 38                     lowerbound = (lowerbound+i)/2
+--[ 2019.10.01.10.42.59.461.0 ]--
+r 38                     lowerbound = (lowerbound+i)/2;
+--[ 2019.10.01.10.43.03.300.0 ]--
+- 39
+--[ 2019.10.01.10.43.26.146.0 ]--
+r 39                 } 
+--[ 2019.10.01.10.43.26.483.0 ]--
+r 39                 } e
+--[ 2019.10.01.10.43.26.661.0 ]--
+r 39                 } el
+--[ 2019.10.01.10.43.26.768.0 ]--
+r 39                 } els
+--[ 2019.10.01.10.43.26.910.0 ]--
+r 39                 } else
+--[ 2019.10.01.10.43.27.435.0 ]--
+r 39                 } else 
+--[ 2019.10.01.10.43.27.597.0 ]--
+r 39                 } else {
+--[ 2019.10.01.10.43.27.903.0 ]--
++ 40 
++ 41 }
+--[ 2019.10.01.10.43.27.925.0 ]--
+r 41                 }
+--[ 2019.10.01.10.43.27.943.0 ]--
+r 40                     
+--[ 2019.10.01.10.43.33.271.0 ]--
+r 40                     l
+--[ 2019.10.01.10.43.33.434.0 ]--
+r 40                     lo
+--[ 2019.10.01.10.43.33.560.0 ]--
+r 40                     low
+--[ 2019.10.01.10.43.33.676.0 ]--
+r 40                     lowe
+--[ 2019.10.01.10.43.33.950.0 ]--
+r 40                     lowerbound
+--[ 2019.10.01.10.43.38.831.0 ]--
+r 40                     lowerbound 
+--[ 2019.10.01.10.43.39.244.0 ]--
+r 40                     lowerbound =
+--[ 2019.10.01.10.43.40.265.0 ]--
+r 40                     lowerbound = 
+--[ 2019.10.01.10.43.40.403.0 ]--
+r 40                     lowerbound = i
+--[ 2019.10.01.10.43.41.708.0 ]--
+r 40                     lowerbound = i;
+--[ 2019.10.01.10.43.42.029.0 ]--
++ 41                     
+--[ 2019.10.01.10.43.44.592.0 ]--
+r 41                     u
+--[ 2019.10.01.10.43.44.794.0 ]--
+r 41                     up
+--[ 2019.10.01.10.43.44.861.0 ]--
+r 41                     upp
+--[ 2019.10.01.10.43.44.969.0 ]--
+r 41                     uppe
+--[ 2019.10.01.10.43.45.102.0 ]--
+r 41                     upper
+--[ 2019.10.01.10.43.46.551.0 ]--
+r 41                     upperbound
+--[ 2019.10.01.10.43.47.721.0 ]--
+r 41                     upperbound 
+--[ 2019.10.01.10.43.47.784.0 ]--
+r 41                     upperbound =
+--[ 2019.10.01.10.43.47.866.0 ]--
+r 41                     upperbound = 
+--[ 2019.10.01.10.43.53.842.0 ]--
+r 41                     upperbound = (lowerbound+i)/2;
+--[ 2019.10.01.10.44.05.449.0 ]--
+r 41                     upperbound = (lowerbound+)/2;
+--[ 2019.10.01.10.44.06.473.0 ]--
+r 41                     upperbound = (lowerbound+u)/2;
+--[ 2019.10.01.10.44.06.769.0 ]--
+r 41                     upperbound = (lowerbound+up)/2;
+--[ 2019.10.01.10.44.06.902.0 ]--
+r 41                     upperbound = (lowerbound+upp)/2;
+--[ 2019.10.01.10.44.07.278.0 ]--
+r 41                     upperbound = (lowerbound+uppe)/2;
+--[ 2019.10.01.10.44.07.413.0 ]--
+r 41                     upperbound = (lowerbound+upper)/2;
+--[ 2019.10.01.10.44.08.020.0 ]--
+r 41                     upperbound = (lowerbound+upperb)/2;
+--[ 2019.10.01.10.44.08.123.0 ]--
+r 41                     upperbound = (lowerbound+upperbo)/2;
+--[ 2019.10.01.10.44.08.262.0 ]--
+r 41                     upperbound = (lowerbound+upperbou)/2;
+--[ 2019.10.01.10.44.08.558.0 ]--
+r 41                     upperbound = (lowerbound+upperboun)/2;
+--[ 2019.10.01.10.44.09.007.0 ]--
+r 41                     upperbound = (lowerbound+upperbound)/2;
+--[ 2019.10.01.10.44.15.592.0 ]--
+r 38                     lowerbound = (lowerbound+)/2;
+--[ 2019.10.01.10.44.16.011.0 ]--
+r 38                     lowerbound = (lowerbound+u)/2;
+--[ 2019.10.01.10.44.16.387.0 ]--
+r 38                     lowerbound = (lowerbound+up)/2;
+--[ 2019.10.01.10.44.16.500.0 ]--
+r 38                     lowerbound = (lowerbound+upp)/2;
+--[ 2019.10.01.10.44.16.646.0 ]--
+r 38                     lowerbound = (lowerbound+uppe)/2;
+--[ 2019.10.01.10.44.16.754.0 ]--
+r 38                     lowerbound = (lowerbound+upper)/2;
+--[ 2019.10.01.10.44.17.186.0 ]--
+r 38                     lowerbound = (lowerbound+upperb)/2;
+--[ 2019.10.01.10.44.17.320.0 ]--
+r 38                     lowerbound = (lowerbound+upperbo)/2;
+--[ 2019.10.01.10.44.17.436.0 ]--
+r 38                     lowerbound = (lowerbound+upperbou)/2;
+--[ 2019.10.01.10.44.17.631.0 ]--
+r 38                     lowerbound = (lowerbound+upperboun)/2;
+--[ 2019.10.01.10.44.17.800.0 ]--
+r 38                     lowerbound = (lowerbound+upperbound)/2;
+--[ 2019.10.01.10.44.41.711.0 ]--
+r 43 
+--[ 2019.10.01.10.44.42.102.0 ]--
+- 43
+--[ 2019.10.01.10.45.00.323.0 ]--
+UpdateTree (AD): 8 0
++ /out/production/L01_FindTheOne/algs4.jar
++ /out/production/L01_FindTheOne/Neo.class
++ /out/production/L01_FindTheOne/stdlib.jar
++ /out/production/L01_FindTheOne/Neo_Up.class
++ /out/production/L01_FindTheOne/Neo_Down.class
++ /out/production/L01_FindTheOne/Neo_Left.class
++ /out/production/L01_FindTheOne/Neo_Right.class
++ /out/production/L01_FindTheOne/FindTheOne.class
+
+--[ 2019.10.01.10.45.00.385.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.10.46.37.545.0 ]--
+r 35             while(neo.get(i) != 1 && neo.get(i-)-1 != 0 && neo.get(i)+1 != 1){
+--[ 2019.10.01.10.46.37.635.0 ]--
+r 35             while(neo.get(i) != 1 && neo.get(i-1)-1 != 0 && neo.get(i)+1 != 1){
+--[ 2019.10.01.10.46.39.153.0 ]--
+r 35             while(neo.get(i) != 1 && neo.get(i-1)1 != 0 && neo.get(i)+1 != 1){
+--[ 2019.10.01.10.46.39.287.0 ]--
+r 35             while(neo.get(i) != 1 && neo.get(i-1) != 0 && neo.get(i)+1 != 1){
+--[ 2019.10.01.10.46.42.877.0 ]--
+r 35             while(neo.get(i) != 1 && neo.get(i-1) != 0 && neo.get(i)1 != 1){
+--[ 2019.10.01.10.46.42.989.0 ]--
+r 35             while(neo.get(i) != 1 && neo.get(i-1) != 0 && neo.get(i) != 1){
+--[ 2019.10.01.10.46.44.382.0 ]--
+r 35             while(neo.get(i) != 1 && neo.get(i-1) != 0 && neo.get(i+) != 1){
+--[ 2019.10.01.10.46.44.749.0 ]--
+r 35             while(neo.get(i) != 1 && neo.get(i-1) != 0 && neo.get(i+1) != 1){
+--[ 2019.10.01.10.47.35.122.0 ]--
++ 39                     
+--[ 2019.10.01.10.47.36.158.0 ]--
+r 39                     i
+--[ 2019.10.01.10.47.36.435.0 ]--
+r 39                     i 
+--[ 2019.10.01.10.47.36.582.0 ]--
+r 39                     i =
+--[ 2019.10.01.10.47.36.659.0 ]--
+r 39                     i = 
+--[ 2019.10.01.10.47.56.350.0 ]--
+r 39                     i =
+--[ 2019.10.01.10.47.56.608.0 ]--
+r 39                     i 
+--[ 2019.10.01.10.47.56.848.0 ]--
+r 39                     i
+--[ 2019.10.01.10.47.57.129.0 ]--
+r 39                     
+--[ 2019.10.01.10.47.57.412.0 ]--
+- 39
+--[ 2019.10.01.10.48.00.690.0 ]--
+r 38                     i = (lowerbound+upperbound)/2;
+--[ 2019.10.01.10.48.05.340.0 ]--
+r 41                     i = (lowerbound+upperbound)/2;
+--[ 2019.10.01.10.48.45.503.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.10.51.58.044.0 ]--
+r 35             while(neo.get(i) =){
+--[ 2019.10.01.10.51.58.152.0 ]--
+r 35             while(neo.get(i) ==){
+--[ 2019.10.01.10.52.00.249.0 ]--
+r 35             while(neo.get(i) == ){
+--[ 2019.10.01.10.52.01.976.0 ]--
+r 35             while(neo.get(i) == 0){
+--[ 2019.10.01.10.52.05.701.0 ]--
+r 35             while(neo.get(i) == 0 ){
+--[ 2019.10.01.10.52.06.664.0 ]--
+r 35             while(neo.get(i) == 0 |){
+--[ 2019.10.01.10.52.06.820.0 ]--
+r 35             while(neo.get(i) == 0 ||){
+--[ 2019.10.01.10.52.07.543.0 ]--
+r 35             while(neo.get(i) == 0 || ){
+--[ 2019.10.01.10.52.22.482.0 ]--
+r 35             while(neo.get(i) == 0 || g){
+--[ 2019.10.01.10.52.22.699.0 ]--
+r 35             while(neo.get(i) == 0 || ge){
+--[ 2019.10.01.10.52.22.867.0 ]--
+r 35             while(neo.get(i) == 0 || get){
+--[ 2019.10.01.10.52.25.088.0 ]--
+r 35             while(neo.get(i) == 0 || get()){
+--[ 2019.10.01.10.52.39.765.0 ]--
+r 35             while(neo.get(i) == 0 || get(i)){
+--[ 2019.10.01.10.52.40.519.0 ]--
+r 35             while(neo.get(i) == 0 || get(i-)){
+--[ 2019.10.01.10.52.40.590.0 ]--
+r 35             while(neo.get(i) == 0 || get(i-1)){
+--[ 2019.10.01.10.52.45.129.0 ]--
+r 35             while(neo.get(i) == 0 || nget(i-1)){
+--[ 2019.10.01.10.52.45.362.0 ]--
+r 35             while(neo.get(i) == 0 || neget(i-1)){
+--[ 2019.10.01.10.52.45.433.0 ]--
+r 35             while(neo.get(i) == 0 || neoget(i-1)){
+--[ 2019.10.01.10.52.45.997.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1)){
+--[ 2019.10.01.10.52.49.669.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) ){
+--[ 2019.10.01.10.52.50.740.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) !){
+--[ 2019.10.01.10.52.51.017.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) !=){
+--[ 2019.10.01.10.52.51.096.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) != ){
+--[ 2019.10.01.10.52.55.044.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) != 0){
+--[ 2019.10.01.10.53.13.858.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) != ){
+--[ 2019.10.01.10.53.14.018.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) !=){
+--[ 2019.10.01.10.53.14.195.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) !){
+--[ 2019.10.01.10.53.14.321.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) ){
+--[ 2019.10.01.10.53.15.750.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) =){
+--[ 2019.10.01.10.53.15.852.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) ==){
+--[ 2019.10.01.10.53.16.190.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) == ){
+--[ 2019.10.01.10.53.16.278.0 ]--
+r 35             while(neo.get(i) == 0 || neo.get(i-1) == 1){
+--[ 2019.10.01.10.53.25.329.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.10.55.50.249.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.10.55.53.483.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.04.10.026.0 ]--
++ 54             int i = neo.size()/2;
++ 55             int upperbound = neo.size();
++ 56             int lowerbound = 0;
++ 57             while(neo.get(i) == 0 || neo.get(i-1) == 1){
++ 58                 if (neo.get(i) == 1){
++ 59                     upperbound = i;
++ 60                     i = (lowerbound+upperbound)/2;
++ 61                 } else {
++ 62                     lowerbound = i;
++ 63                     i = (lowerbound+upperbound)/2;
++ 64                 }
++ 65             }
+r 66             neo.found1(i);
+--[ 2019.10.01.11.09.10.212.0 ]--
++ 54             
+--[ 2019.10.01.11.09.28.322.0 ]--
+r 54             u
+--[ 2019.10.01.11.09.28.519.0 ]--
+r 54             up
+--[ 2019.10.01.11.09.28.679.0 ]--
+r 54             upp
+--[ 2019.10.01.11.09.30.617.0 ]--
+r 54             up
+--[ 2019.10.01.11.09.30.736.0 ]--
+r 54             u
+--[ 2019.10.01.11.09.30.860.0 ]--
+r 54             
+--[ 2019.10.01.11.11.46.212.0 ]--
+r 54             i
+--[ 2019.10.01.11.11.46.350.0 ]--
+r 54             if
+--[ 2019.10.01.11.11.46.499.0 ]--
+r 54             if 
+--[ 2019.10.01.11.12.14.414.0 ]--
+r 54             if
+--[ 2019.10.01.11.12.14.975.0 ]--
+r 54             if()
+--[ 2019.10.01.11.12.15.912.0 ]--
+r 54             if(n)
+--[ 2019.10.01.11.12.16.106.0 ]--
+r 54             if(ne)
+--[ 2019.10.01.11.12.16.194.0 ]--
+r 54             if(neo)
+--[ 2019.10.01.11.12.17.622.0 ]--
+r 54             if(neo.)
+--[ 2019.10.01.11.12.18.253.0 ]--
+r 54             if(neo.s)
+--[ 2019.10.01.11.12.18.444.0 ]--
+r 54             if(neo.si)
+--[ 2019.10.01.11.12.19.243.0 ]--
+r 54             if(neo.siz)
+--[ 2019.10.01.11.12.19.529.0 ]--
+r 54             if(neo.size)
+--[ 2019.10.01.11.12.20.384.0 ]--
+r 54             if(neo.size )
+--[ 2019.10.01.11.12.20.673.0 ]--
+r 54             if(neo.size !)
+--[ 2019.10.01.11.12.21.910.0 ]--
+r 54             if(neo.size !=)
+--[ 2019.10.01.11.12.22.032.0 ]--
+r 54             if(neo.size != )
+--[ 2019.10.01.11.13.07.338.0 ]--
+r 54             if(neo.size !=)
+--[ 2019.10.01.11.13.07.505.0 ]--
+r 54             if(neo.size !)
+--[ 2019.10.01.11.13.07.709.0 ]--
+r 54             if(neo.size )
+--[ 2019.10.01.11.13.09.623.0 ]--
+r 54             if(neo.size)
+--[ 2019.10.01.11.13.09.844.0 ]--
+r 54             if(neo.siz)
+--[ 2019.10.01.11.13.10.168.0 ]--
+r 54             if(neo.si)
+--[ 2019.10.01.11.13.10.627.0 ]--
+r 54             if(neo.s)
+--[ 2019.10.01.11.13.10.966.0 ]--
+r 54             if(neo.)
+--[ 2019.10.01.11.13.13.222.0 ]--
+r 54             if(neo.g)
+--[ 2019.10.01.11.13.13.539.0 ]--
+r 54             if(neo.ge)
+--[ 2019.10.01.11.13.13.660.0 ]--
+r 54             if(neo.get)
+--[ 2019.10.01.11.13.14.198.0 ]--
+r 54             if(neo.get())
+--[ 2019.10.01.11.13.14.469.0 ]--
+r 54             if(neo.get(i))
+--[ 2019.10.01.11.13.17.047.0 ]--
+r 54             if(neo.get(i)!)
+--[ 2019.10.01.11.13.21.623.0 ]--
+r 54             if(neo.get(i)! )
+--[ 2019.10.01.11.13.21.716.0 ]--
+r 54             if(neo.get(i)! =)
+--[ 2019.10.01.11.13.24.468.0 ]--
+r 54             if(neo.get(i)! ==)
+--[ 2019.10.01.11.13.24.763.0 ]--
+r 54             if(neo.get(i)! == )
+--[ 2019.10.01.11.13.26.023.0 ]--
+r 54             if(neo.get(i)! == 1)
+--[ 2019.10.01.11.13.28.204.0 ]--
+r 54             if(neo.get(i)! == 1){
+--[ 2019.10.01.11.13.28.615.0 ]--
++ 55 
++ 56 }
+--[ 2019.10.01.11.13.28.638.0 ]--
+r 56             }
+--[ 2019.10.01.11.13.28.655.0 ]--
+r 55                 
+--[ 2019.10.01.11.13.30.359.0 ]--
+r 55                 i
+--[ 2019.10.01.11.13.31.104.0 ]--
+r 55                 i 
+--[ 2019.10.01.11.13.31.929.0 ]--
+r 55                 i +
+--[ 2019.10.01.11.13.32.533.0 ]--
+r 55                 i +=
+--[ 2019.10.01.11.13.33.947.0 ]--
+r 55                 i += 
+--[ 2019.10.01.11.13.34.099.0 ]--
+r 55                 i += 1
+--[ 2019.10.01.11.13.34.261.0 ]--
+r 55                 i += 10
+--[ 2019.10.01.11.13.34.719.0 ]--
+r 55                 i += 100
+--[ 2019.10.01.11.13.35.173.0 ]--
+r 55                 i += 1000
+--[ 2019.10.01.11.13.35.700.0 ]--
+r 55                 i += 10000
+--[ 2019.10.01.11.13.36.008.0 ]--
+r 55                 i += 100000
+--[ 2019.10.01.11.13.36.278.0 ]--
+r 55                 i += 1000000
+--[ 2019.10.01.11.13.37.481.0 ]--
+r 55                 i += 1000000;
+--[ 2019.10.01.11.13.40.550.0 ]--
++ 54             
+--[ 2019.10.01.11.13.40.906.0 ]--
+r 54             i
+--[ 2019.10.01.11.13.41.045.0 ]--
+r 54             in
+--[ 2019.10.01.11.13.41.222.0 ]--
+r 54             int
+--[ 2019.10.01.11.13.42.397.0 ]--
+r 54             int 
+--[ 2019.10.01.11.13.42.620.0 ]--
+r 54             int i
+--[ 2019.10.01.11.13.42.815.0 ]--
+r 54             int i 
+--[ 2019.10.01.11.13.43.404.0 ]--
+r 54             int i =
+--[ 2019.10.01.11.13.45.854.0 ]--
+r 54             int i = 
+--[ 2019.10.01.11.13.46.776.0 ]--
+r 54             int i = 1
+--[ 2019.10.01.11.13.46.992.0 ]--
+r 54             int i = 10
+--[ 2019.10.01.11.13.47.226.0 ]--
+r 54             int i = 100
+--[ 2019.10.01.11.13.48.247.0 ]--
+r 54             int i = 1000
+--[ 2019.10.01.11.13.49.102.0 ]--
+r 54             int i = 10000
+--[ 2019.10.01.11.13.49.262.0 ]--
+r 54             int i = 100000
+--[ 2019.10.01.11.13.49.524.0 ]--
+r 54             int i = 1000000
+--[ 2019.10.01.11.13.50.521.0 ]--
+r 54             int i = 1000000;
+--[ 2019.10.01.11.13.50.683.0 ]--
+r 54             int i = 1000000; 
+--[ 2019.10.01.11.13.51.957.0 ]--
+r 54             int i = 1000000;  
+--[ 2019.10.01.11.13.52.709.0 ]--
+r 54             int i = 1000000; 
+--[ 2019.10.01.11.13.58.136.0 ]--
+r 55             if(neo.get(i)! = 1){
+--[ 2019.10.01.11.13.58.341.0 ]--
+r 55             if(neo.get(i)!= 1){
+--[ 2019.10.01.11.13.59.402.0 ]--
+r 55             if(neo.get(i) != 1){
+--[ 2019.10.01.11.14.12.479.0 ]--
+r 58             inti = neo.size()/2;
+--[ 2019.10.01.11.14.12.722.0 ]--
+r 58             ini = neo.size()/2;
+--[ 2019.10.01.11.14.12.941.0 ]--
+r 58             ii = neo.size()/2;
+--[ 2019.10.01.11.14.13.204.0 ]--
+r 58             i = neo.size()/2;
+--[ 2019.10.01.11.14.21.544.0 ]--
+r 59             int upperbound = i
+--[ 2019.10.01.11.14.23.066.0 ]--
+r 59             int upperbound = i;
+--[ 2019.10.01.11.14.26.128.0 ]--
+r 60             int lowerbound = ;
+--[ 2019.10.01.11.14.26.520.0 ]--
+r 60             int lowerbound = i;
+--[ 2019.10.01.11.14.26.820.0 ]--
+r 60             int lowerbound = i ;
+--[ 2019.10.01.11.14.27.061.0 ]--
+r 60             int lowerbound = i -;
+--[ 2019.10.01.11.14.27.153.0 ]--
+r 60             int lowerbound = i - ;
+--[ 2019.10.01.11.14.27.596.0 ]--
+r 60             int lowerbound = i - 1;
+--[ 2019.10.01.11.14.27.790.0 ]--
+r 60             int lowerbound = i - 10;
+--[ 2019.10.01.11.14.28.265.0 ]--
+r 60             int lowerbound = i - 100;
+--[ 2019.10.01.11.14.28.563.0 ]--
+r 60             int lowerbound = i - 1000;
+--[ 2019.10.01.11.14.29.206.0 ]--
+r 60             int lowerbound = i - 10000;
+--[ 2019.10.01.11.14.29.603.0 ]--
+r 60             int lowerbound = i - 100000;
+--[ 2019.10.01.11.14.29.884.0 ]--
+r 60             int lowerbound = i - 1000000;
+--[ 2019.10.01.11.14.49.150.0 ]--
+r 58             
+--[ 2019.10.01.11.14.50.329.0 ]--
+- 58
+--[ 2019.10.01.11.14.52.994.0 ]--
++ 58             
+--[ 2019.10.01.11.14.55.148.0 ]--
++ 61             
+--[ 2019.10.01.11.14.55.299.0 ]--
+r 61             i = neo.size()/2;
+--[ 2019.10.01.11.14.59.545.0 ]--
++ 62             
+--[ 2019.10.01.11.15.10.380.0 ]--
+r 61             i = (neo.size())/2;
+--[ 2019.10.01.11.15.10.774.0 ]--
+r 61             i = (u)/2;
+--[ 2019.10.01.11.15.11.053.0 ]--
+r 61             i = (up)/2;
+--[ 2019.10.01.11.15.11.155.0 ]--
+r 61             i = (upp)/2;
+--[ 2019.10.01.11.15.11.324.0 ]--
+r 61             i = (uppe)/2;
+--[ 2019.10.01.11.15.11.447.0 ]--
+r 61             i = (upper)/2;
+--[ 2019.10.01.11.15.11.930.0 ]--
+r 61             i = (upperb)/2;
+--[ 2019.10.01.11.15.12.043.0 ]--
+r 61             i = (upperbo)/2;
+--[ 2019.10.01.11.15.12.157.0 ]--
+r 61             i = (upperbou)/2;
+--[ 2019.10.01.11.15.12.332.0 ]--
+r 61             i = (upperboun)/2;
+--[ 2019.10.01.11.15.12.501.0 ]--
+r 61             i = (upperbound)/2;
+--[ 2019.10.01.11.15.29.181.0 ]--
+r 61             i = (upperbound+)/2;
+--[ 2019.10.01.11.15.34.344.0 ]--
+r 61             i = (upperbound+l)/2;
+--[ 2019.10.01.11.15.34.532.0 ]--
+r 61             i = (upperbound+lo)/2;
+--[ 2019.10.01.11.15.34.673.0 ]--
+r 61             i = (upperbound+low)/2;
+--[ 2019.10.01.11.15.34.836.0 ]--
+r 61             i = (upperbound+lowe)/2;
+--[ 2019.10.01.11.15.34.998.0 ]--
+r 61             i = (upperbound+lower)/2;
+--[ 2019.10.01.11.15.35.465.0 ]--
+r 61             i = (upperbound+lowerb)/2;
+--[ 2019.10.01.11.15.35.531.0 ]--
+r 61             i = (upperbound+lowerbo)/2;
+--[ 2019.10.01.11.15.35.883.0 ]--
+r 61             i = (upperbound+lowerbou)/2;
+--[ 2019.10.01.11.15.36.108.0 ]--
+r 61             i = (upperbound+lowerboun)/2;
+--[ 2019.10.01.11.15.36.501.0 ]--
+r 61             i = (upperbound+lowerbound)/2;
+--[ 2019.10.01.11.15.44.523.0 ]--
+r 54             int i = 1000000;
+r 58 
+r 62 
+--[ 2019.10.01.11.15.46.456.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.17.53.489.0 ]--
+r 55             i(neo.get(i) != 1){
+--[ 2019.10.01.11.17.53.804.0 ]--
+r 55             (neo.get(i) != 1){
+--[ 2019.10.01.11.17.54.935.0 ]--
+r 55             w(neo.get(i) != 1){
+--[ 2019.10.01.11.17.54.977.0 ]--
+r 55             wh(neo.get(i) != 1){
+--[ 2019.10.01.11.17.55.058.0 ]--
+r 55             whi(neo.get(i) != 1){
+--[ 2019.10.01.11.17.55.126.0 ]--
+r 55             whil(neo.get(i) != 1){
+--[ 2019.10.01.11.17.55.288.0 ]--
+r 55             while(neo.get(i) != 1){
+--[ 2019.10.01.11.18.03.996.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.19.23.978.0 ]--
+r 54             int i = 100000;
+--[ 2019.10.01.11.19.24.204.0 ]--
+r 54             int i = 10000;
+--[ 2019.10.01.11.19.24.505.0 ]--
+r 54             int i = 1000;
+--[ 2019.10.01.11.19.26.684.0 ]--
+r 56                 i += 100000;
+--[ 2019.10.01.11.19.26.826.0 ]--
+r 56                 i += 10000;
+--[ 2019.10.01.11.19.27.035.0 ]--
+r 56                 i += 1000;
+--[ 2019.10.01.11.19.29.758.0 ]--
+r 60             int lowerbound = i - 100000;
+--[ 2019.10.01.11.19.29.890.0 ]--
+r 60             int lowerbound = i - 10000;
+--[ 2019.10.01.11.19.30.113.0 ]--
+r 60             int lowerbound = i - 1000;
+--[ 2019.10.01.11.19.36.514.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.19.41.174.0 ]--
+r 54             int i = 100;
+--[ 2019.10.01.11.19.41.328.0 ]--
+r 54             int i = 10;
+--[ 2019.10.01.11.19.43.557.0 ]--
+r 56                 i += 100;
+--[ 2019.10.01.11.19.43.678.0 ]--
+r 56                 i += 10;
+--[ 2019.10.01.11.19.46.019.0 ]--
+r 60             int lowerbound = i - 100;
+--[ 2019.10.01.11.19.46.134.0 ]--
+r 60             int lowerbound = i - 10;
+--[ 2019.10.01.11.19.51.669.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.21.28.391.0 ]--
+r 60             int lowerbound = i - 1;
+--[ 2019.10.01.11.21.28.513.0 ]--
+r 60             int lowerbound = i - ;
+--[ 2019.10.01.11.21.28.677.0 ]--
+r 60             int lowerbound = i -;
+--[ 2019.10.01.11.21.28.846.0 ]--
+r 60             int lowerbound = i ;
+--[ 2019.10.01.11.21.28.987.0 ]--
+r 60             int lowerbound = i;
+--[ 2019.10.01.11.21.29.165.0 ]--
+r 60             int lowerbound = ;
+--[ 2019.10.01.11.21.30.178.0 ]--
+r 60             int lowerbound = M;
+--[ 2019.10.01.11.21.31.098.0 ]--
+r 60             int lowerbound = MA;
+--[ 2019.10.01.11.21.31.334.0 ]--
+r 60             int lowerbound = MAC;
+--[ 2019.10.01.11.21.32.176.0 ]--
+r 60             int lowerbound = MA;
+--[ 2019.10.01.11.21.32.805.0 ]--
+r 60             int lowerbound = MAX;
+--[ 2019.10.01.11.21.42.291.0 ]--
+r 60             int lowerbound = IMAX;
+--[ 2019.10.01.11.21.42.617.0 ]--
+r 60             int lowerbound = InMAX;
+--[ 2019.10.01.11.21.42.894.0 ]--
+r 60             int lowerbound = IntMAX;
+--[ 2019.10.01.11.21.43.012.0 ]--
+r 60             int lowerbound = InteMAX;
+--[ 2019.10.01.11.21.43.367.0 ]--
+r 60             int lowerbound = IntegMAX;
+--[ 2019.10.01.11.21.43.470.0 ]--
+r 60             int lowerbound = IntegeMAX;
+--[ 2019.10.01.11.21.43.530.0 ]--
+r 60             int lowerbound = IntegerMAX;
+--[ 2019.10.01.11.21.45.103.0 ]--
+r 60             int lowerbound = Integer.MAX;
+--[ 2019.10.01.11.21.47.125.0 ]--
+r 60             int lowerbound = Integer.MAX_VALUE;
+--[ 2019.10.01.11.21.57.003.0 ]--
+r 59             int upperbound = Integer.MAX_VALUE;
+--[ 2019.10.01.11.22.00.179.0 ]--
+r 60             int lowerbound = 0;
+--[ 2019.10.01.11.22.07.895.0 ]--
+- 54
+- 54
+- 54
+r 54 
+--[ 2019.10.01.11.22.08.513.0 ]--
+- 54
+--[ 2019.10.01.11.22.18.779.0 ]--
+r 57             ii = (upperbound+lowerbound)/2;
+--[ 2019.10.01.11.22.18.925.0 ]--
+r 57             ini = (upperbound+lowerbound)/2;
+--[ 2019.10.01.11.22.19.186.0 ]--
+r 57             inti = (upperbound+lowerbound)/2;
+--[ 2019.10.01.11.22.19.367.0 ]--
+r 57             int i = (upperbound+lowerbound)/2;
+--[ 2019.10.01.11.22.28.424.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.23.56.040.0 ]--
++ 58             
+--[ 2019.10.01.11.23.57.401.0 ]--
+r 58             S
+--[ 2019.10.01.11.23.57.805.0 ]--
+r 58             St
+--[ 2019.10.01.11.23.58.336.0 ]--
+r 58             Std
+--[ 2019.10.01.11.23.59.351.0 ]--
+r 58             StdOut
+--[ 2019.10.01.11.24.00.683.0 ]--
+r 58             StdOut.
+--[ 2019.10.01.11.24.01.034.0 ]--
+r 58             StdOut.p
+--[ 2019.10.01.11.24.01.353.0 ]--
+r 58             StdOut.pr
+--[ 2019.10.01.11.24.01.501.0 ]--
+r 58             StdOut.pri
+--[ 2019.10.01.11.24.01.597.0 ]--
+r 58             StdOut.prin
+--[ 2019.10.01.11.24.02.107.0 ]--
+r 58             StdOut.println
+--[ 2019.10.01.11.24.02.115.0 ]--
+r 58             StdOut.println()
+--[ 2019.10.01.11.24.02.123.0 ]--
+r 58             StdOut.println();
+--[ 2019.10.01.11.24.03.407.0 ]--
+r 58             StdOut.println(i);
+--[ 2019.10.01.11.24.16.123.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.24.32.198.0 ]--
+r 58             
+--[ 2019.10.01.11.24.34.026.0 ]--
++ 61                 
+--[ 2019.10.01.11.24.34.366.0 ]--
+r 61                 StdOut.println(i);
+--[ 2019.10.01.11.24.37.776.0 ]--
+r 58 
+--[ 2019.10.01.11.24.39.693.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.25.33.761.0 ]--
+r 61                 
+--[ 2019.10.01.11.25.40.339.0 ]--
++ 69                 
+--[ 2019.10.01.11.25.40.482.0 ]--
+r 69                 StdOut.println(i);
+--[ 2019.10.01.11.25.42.870.0 ]--
+r 61 
+--[ 2019.10.01.11.25.45.044.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.28.39.436.0 ]--
+r 64                     i = lowerbound+upperbound)/2;
+--[ 2019.10.01.11.28.41.833.0 ]--
+r 64                     i = lowerbound+(upperbound)/2;
+--[ 2019.10.01.11.28.44.537.0 ]--
+r 64                     i = lowerbound+(upperbound-)/2;
+--[ 2019.10.01.11.28.45.010.0 ]--
+r 64                     i = lowerbound+(upperbound-l)/2;
+--[ 2019.10.01.11.28.45.287.0 ]--
+r 64                     i = lowerbound+(upperbound-lo)/2;
+--[ 2019.10.01.11.28.45.516.0 ]--
+r 64                     i = lowerbound+(upperbound-low)/2;
+--[ 2019.10.01.11.28.45.807.0 ]--
+r 64                     i = lowerbound+(upperbound-lowe)/2;
+--[ 2019.10.01.11.28.45.943.0 ]--
+r 64                     i = lowerbound+(upperbound-lower)/2;
+--[ 2019.10.01.11.28.47.124.0 ]--
+r 64                     i = lowerbound+(upperbound-lowerbound)/2;
+--[ 2019.10.01.11.28.49.749.0 ]--
+r 64                     i = lowerbound+((upperbound-lowerbound)/2;
+--[ 2019.10.01.11.28.52.648.0 ]--
+r 64                     i = lowerbound+((upperbound-lowerbound)/2);
+--[ 2019.10.01.11.29.00.694.0 ]--
+r 67                     i = (lowerbound+(upperbound)/2;
+--[ 2019.10.01.11.29.00.820.0 ]--
+r 67                     i = (lowerbound+((upperbound)/2;
+--[ 2019.10.01.11.29.03.060.0 ]--
+r 67                     i = (lowerbound+((upperbound)/2);
+--[ 2019.10.01.11.29.06.760.0 ]--
+r 67                     i = (lowerbound+((upperbound-)/2);
+--[ 2019.10.01.11.29.07.085.0 ]--
+r 67                     i = (lowerbound+((upperbound-l)/2);
+--[ 2019.10.01.11.29.07.270.0 ]--
+r 67                     i = (lowerbound+((upperbound-lo)/2);
+--[ 2019.10.01.11.29.07.467.0 ]--
+r 67                     i = (lowerbound+((upperbound-low)/2);
+--[ 2019.10.01.11.29.07.557.0 ]--
+r 67                     i = (lowerbound+((upperbound-lowe)/2);
+--[ 2019.10.01.11.29.07.707.0 ]--
+r 67                     i = (lowerbound+((upperbound-lower)/2);
+--[ 2019.10.01.11.29.08.576.0 ]--
+r 67                     i = (lowerbound+((upperbound-lowerbound)/2);
+--[ 2019.10.01.11.29.22.879.0 ]--
+r 67                     i = lowerbound+((upperbound-lowerbound)/2);
+--[ 2019.10.01.11.29.28.031.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.30.08.537.0 ]--
+r 69                 /StdOut.println(i);
+--[ 2019.10.01.11.30.08.701.0 ]--
+r 69                 //StdOut.println(i);
+--[ 2019.10.01.11.31.47.503.0 ]--
+r 81             
+--[ 2019.10.01.11.31.48.197.0 ]--
++ 81                         int upperbound = Integer.MAX_VALUE;
++ 82             int lowerbound = 0;
++ 83             int i = (upperbound+lowerbound)/2;
++ 84 
++ 85 
++ 86             while(neo.get(i) == 0 || neo.get(i-1) == 1){
++ 87 
++ 88                 if (neo.get(i) == 1){
++ 89                     upperbound = i;
++ 90                     i = lowerbound+((upperbound-lowerbound)/2);
++ 91                 } else {
++ 92                     lowerbound = i;
++ 93                     i = lowerbound+((upperbound-lowerbound)/2);
++ 94                 }
++ 95                 //StdOut.println(i);
++ 96             }
+r 97             neo.found1(i);
+--[ 2019.10.01.11.31.48.303.0 ]--
+r 81             int upperbound = Integer.MAX_VALUE;
+--[ 2019.10.01.11.31.52.660.0 ]--
+r 81             int upperbound = D.MAX_VALUE;
+--[ 2019.10.01.11.31.52.975.0 ]--
+r 81             int upperbound = Do.MAX_VALUE;
+--[ 2019.10.01.11.31.53.969.0 ]--
+r 81             int upperbound = Dou.MAX_VALUE;
+--[ 2019.10.01.11.31.54.052.0 ]--
+r 81             int upperbound = Doub.MAX_VALUE;
+--[ 2019.10.01.11.31.54.235.0 ]--
+r 81             int upperbound = Doubl.MAX_VALUE;
+--[ 2019.10.01.11.31.54.335.0 ]--
+r 81             int upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.18.167.0 ]--
+r 81             in upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.18.387.0 ]--
+r 81             i upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.18.789.0 ]--
+r 81              upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.19.518.0 ]--
+r 81             d upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.20.446.0 ]--
+r 81             do upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.20.569.0 ]--
+r 81             dou upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.20.816.0 ]--
+r 81             doub upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.20.967.0 ]--
+r 81             doubl upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.21.071.0 ]--
+r 81             double upperbound = Double.MAX_VALUE;
+--[ 2019.10.01.11.32.25.597.0 ]--
+r 82             double lowerbound = 0;
+--[ 2019.10.01.11.32.26.948.0 ]--
+r 83             double i = (upperbound+lowerbound)/2;
+--[ 2019.10.01.11.32.42.968.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.11.35.09.399.0 ]--
+r 90                     i = lowerbound+((upperbound-lowerbound)//2);
+--[ 2019.10.01.11.35.12.117.0 ]--
+r 90                     i = lowerbound+((upperbound-lowerbound)/2);
+--[ 2019.10.01.11.35.16.477.0 ]--
+r 90                     i = lowerbound+((upperbound-lowerbound)/2.);
+--[ 2019.10.01.11.35.16.874.0 ]--
+r 90                     i = lowerbound+((upperbound-lowerbound)/2.0);
+--[ 2019.10.01.11.35.19.375.0 ]--
+r 93                     i = lowerbound+((upperbound-lowerbound)/2.);
+--[ 2019.10.01.11.35.19.718.0 ]--
+r 93                     i = lowerbound+((upperbound-lowerbound)/2.0);
+--[ 2019.10.01.11.35.31.014.0 ]--
+CompilationStatus (AEW): 0 0 0
+--[ 2019.10.01.15.59.24.592.0 ]--
+DisposeComponent
+--[ 2019.10.07.20.44.37.661.0 ]--
+NewLogger: L01_FindTheOne
+Version: 1.3
+--[ 2019.10.07.20.44.37.938.0 ]--
+InitTree:
+/out/production/L01_FindTheOne/algs4.jar
+/out/production/L01_FindTheOne/Neo.class
+/out/production/L01_FindTheOne/stdlib.jar
+/out/production/L01_FindTheOne/Neo_Up.class
+/out/production/L01_FindTheOne/Neo_Down.class
+/out/production/L01_FindTheOne/Neo_Left.class
+/out/production/L01_FindTheOne/Neo_Right.class
+/out/production/L01_FindTheOne/FindTheOne.class
+/src/Neo.java
+/src/algs4.jar
+/src/stdlib.jar
+/src/Neo_Up.java
+/src/Neo_Down.java
+/src/Neo_Left.java
+/src/Neo_Right.java
+/src/FindTheOne.java
+/.log/history.log
+/.idea/copyright/profiles_settings.xml
+/.idea/libraries/algs4.xml
+/.idea/libraries/stdlib.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/compiler.xml
+/.idea/workspace.xml
+/.idea/uiDesigner.xml
+/.idea/description.html
+/.idea/project-template.xml
+/.cos265
+/readme.html
+/L01_FindTheOne.iml
+/L01_FindTheOne.zip
+
+--[ 2019.10.07.20.44.37.942.0 ]--
+InitFile: /src/Neo_Right.java
+import java.math.BigInteger;
+
+public class Neo_Right extends Neo<BigInteger> {
+    private static final double pStart = 0.9999;
+    private static final double pDecay = 0.9999;
+    private static final BigInteger [] singles = {
+            new BigInteger("0"),
+            new BigInteger("1"),
+            new BigInteger("2"),
+            new BigInteger("3"),
+            new BigInteger("4"),
+            new BigInteger("5"),
+            new BigInteger("6"),
+            new BigInteger("7"),
+            new BigInteger("8"),
+            new BigInteger("9"),
+    };
+
+    private BigInteger i1 = BigInteger.ZERO;
+
+    public Neo_Right() {
+        for(double p = pStart; StdRandom.uniform() < p; p *= pDecay) {
+            i1 = i1.multiply(BigInteger.TEN).add(singles[StdRandom.uniform(10)]);
+        }
+        if(StdRandom.uniform() < 0.5) i1 = i1.negate();
+    }
+
+    public int get(BigInteger i) throws Exception {
+        increaseCalls();
+        if(i.compareTo(i1) < 0) return 0;
+        return 1;
+    }
+
+    public void found1(BigInteger i) throws Exception {
+        foundCalled();
+        if(i.equals(i1)) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.10.07.20.44.37.947.0 ]--
+InitFile: /.cos265
+
+
+--[ 2019.10.07.20.44.37.952.0 ]--
+InitFile: /src/FindTheOne.java
+import java.math.BigInteger;
+
+public class FindTheOne {
+    private static void neo_up_naive() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            int i = 0;
+            while(neo.get(i) == 0) i++; // keep incrementing until
+                                        // we find the first 1!
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_up_bad() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            neo.found1(0);  // this is not the correct position!
+            neo.found1(0);  // this is will throw an exception!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_up() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            int i = neo.size()/2;
+            int upperbound = neo.size();
+            int lowerbound = 0;
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = (lowerbound+upperbound)/2;
+                } else {
+                    lowerbound = i;
+                    i = (lowerbound+upperbound)/2;
+                }
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_down() {
+        StdRandom.setSeed(42);
+        Neo_Down neo = new Neo_Down();
+        try {
+
+            int upperbound = Integer.MAX_VALUE;
+            int lowerbound = 0;
+            int i = (upperbound+lowerbound)/2;
+
+
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2);
+                } else {
+                    lowerbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2);
+                }
+                //StdOut.println(i);
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_left() {
+        StdRandom.setSeed(42);
+        Neo_Left neo = new Neo_Left();
+        try {
+            double upperbound = Double.MAX_VALUE;
+            double lowerbound = 0;
+            double i = (upperbound+lowerbound)/2;
+
+
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2.0);
+                } else {
+                    lowerbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2.0);
+                }
+                //StdOut.println(i);
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_right() {
+        StdRandom.setSeed(42);
+        Neo_Right neo = new Neo_Right();
+        try {
+            // do the tests here!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    public static void main(String[] args) {
+        neo_up_naive();
+        neo_up_bad();
+        neo_up();
+        neo_down();
+        neo_left();
+        neo_right();
+    }
+}
+
+--[ 2019.10.07.20.44.37.956.0 ]--
+InitFile: /src/Neo_Up.java
+public class Neo_Up extends Neo<Integer> {
+    private int N;
+    private int i1;
+
+    public Neo_Up() {
+        N = StdRandom.uniform(1, 1000000);
+        i1 = StdRandom.uniform(N);
+    }
+
+    public int size() {
+        return N;
+    }
+
+    public int get(Integer i) throws Exception {
+        increaseCalls();
+        if(i < 0 || i >= N) throw new IndexOutOfBoundsException();
+        if(i < i1) return 0;
+        return 1;
+    }
+
+    public void found1(Integer i) throws Exception {
+        foundCalled();
+        if(i == i1) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.10.07.20.44.37.961.0 ]--
+InitFile: /src/Neo_Left.java
+public class Neo_Left extends Neo<Double> {
+    private double d1;
+
+    public Neo_Left() {
+        d1 = StdRandom.uniform(0.0, Double.MAX_VALUE);
+    }
+
+    public int get(Double d) throws Exception {
+        increaseCalls();
+        if(d < d1) return 0;
+        return 1;
+    }
+    public void found1(Double d) throws Exception {
+        this.foundCalled();
+        double diff = Math.floor(d - d1);
+        if(Double.compare(diff, 0.0) == 0) {
+            StdOut.println("Perfect!");
+        } else {
+            StdOut.println("You are off by " + Math.abs(diff));
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.10.07.20.44.37.965.0 ]--
+InitFile: /src/Neo.java
+public abstract class Neo<ValType> {
+    private int calls = 0;
+    private boolean foundcalled = false;
+
+    protected void increaseCalls() throws Exception {
+        if(foundcalled) throw new Exception("Cannot check after found is called!");
+        calls++;
+    }
+
+    protected void foundCalled() throws Exception {
+        if(foundcalled) throw new Exception("Cannot check after found is called!");
+        foundcalled = true;
+    }
+
+    protected int callsCount() {
+        return calls;
+    }
+
+    public abstract int get(ValType i) throws Exception;
+    public abstract void found1(ValType i) throws Exception;
+}
+
+--[ 2019.10.07.20.44.37.969.0 ]--
+InitFile: /L01_FindTheOne.iml
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="algs4" level="project" />
+    <orderEntry type="library" name="stdlib" level="project" />
+  </component>
+</module>
+
+--[ 2019.10.07.20.44.37.973.0 ]--
+InitFile: /src/Neo_Down.java
+public class Neo_Down extends Neo<Integer> {
+    private int i1;
+
+    public Neo_Down() {
+        i1 = StdRandom.uniform(Integer.MAX_VALUE);
+    }
+
+    public int get(Integer i) throws Exception {
+        increaseCalls();
+        if(i < 0) throw new IndexOutOfBoundsException();
+        if(i < i1) return 0;
+        return 1;
+    }
+
+    public void found1(Integer i) throws Exception {
+        foundCalled();
+        if(i == i1) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.24.18.29.01.439.0 ]--
+NewLogger: L01_FindTheOne
+Version: 1.3
+--[ 2019.11.24.18.29.01.727.0 ]--
+InitTree:
+/out/production/L01_FindTheOne/algs4.jar
+/out/production/L01_FindTheOne/Neo.class
+/out/production/L01_FindTheOne/stdlib.jar
+/out/production/L01_FindTheOne/Neo_Up.class
+/out/production/L01_FindTheOne/Neo_Down.class
+/out/production/L01_FindTheOne/Neo_Left.class
+/out/production/L01_FindTheOne/Neo_Right.class
+/out/production/L01_FindTheOne/FindTheOne.class
+/src/Neo.java
+/src/algs4.jar
+/src/stdlib.jar
+/src/Neo_Up.java
+/src/Neo_Down.java
+/src/Neo_Left.java
+/src/Neo_Right.java
+/src/FindTheOne.java
+/.log/history.log
+/.idea/copyright/profiles_settings.xml
+/.idea/libraries/algs4.xml
+/.idea/libraries/stdlib.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/compiler.xml
+/.idea/workspace.xml
+/.idea/uiDesigner.xml
+/.idea/description.html
+/.idea/project-template.xml
+/.cos265
+/readme.html
+/L01_FindTheOne.iml
+/L01_FindTheOne.zip
+
+--[ 2019.11.24.18.29.01.727.1 ]--
+InitFile: /src/Neo_Right.java
+import java.math.BigInteger;
+
+public class Neo_Right extends Neo<BigInteger> {
+    private static final double pStart = 0.9999;
+    private static final double pDecay = 0.9999;
+    private static final BigInteger [] singles = {
+            new BigInteger("0"),
+            new BigInteger("1"),
+            new BigInteger("2"),
+            new BigInteger("3"),
+            new BigInteger("4"),
+            new BigInteger("5"),
+            new BigInteger("6"),
+            new BigInteger("7"),
+            new BigInteger("8"),
+            new BigInteger("9"),
+    };
+
+    private BigInteger i1 = BigInteger.ZERO;
+
+    public Neo_Right() {
+        for(double p = pStart; StdRandom.uniform() < p; p *= pDecay) {
+            i1 = i1.multiply(BigInteger.TEN).add(singles[StdRandom.uniform(10)]);
+        }
+        if(StdRandom.uniform() < 0.5) i1 = i1.negate();
+    }
+
+    public int get(BigInteger i) throws Exception {
+        increaseCalls();
+        if(i.compareTo(i1) < 0) return 0;
+        return 1;
+    }
+
+    public void found1(BigInteger i) throws Exception {
+        foundCalled();
+        if(i.equals(i1)) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.24.18.29.01.731.0 ]--
+InitFile: /.cos265
+
+
+--[ 2019.11.24.18.29.01.731.1 ]--
+InitFile: /src/FindTheOne.java
+import java.math.BigInteger;
+
+public class FindTheOne {
+    private static void neo_up_naive() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            int i = 0;
+            while(neo.get(i) == 0) i++; // keep incrementing until
+                                        // we find the first 1!
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_up_bad() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            neo.found1(0);  // this is not the correct position!
+            neo.found1(0);  // this is will throw an exception!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_up() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            int i = neo.size()/2;
+            int upperbound = neo.size();
+            int lowerbound = 0;
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = (lowerbound+upperbound)/2;
+                } else {
+                    lowerbound = i;
+                    i = (lowerbound+upperbound)/2;
+                }
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_down() {
+        StdRandom.setSeed(42);
+        Neo_Down neo = new Neo_Down();
+        try {
+
+            int upperbound = Integer.MAX_VALUE;
+            int lowerbound = 0;
+            int i = (upperbound+lowerbound)/2;
+
+
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2);
+                } else {
+                    lowerbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2);
+                }
+                //StdOut.println(i);
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_left() {
+        StdRandom.setSeed(42);
+        Neo_Left neo = new Neo_Left();
+        try {
+            double upperbound = Double.MAX_VALUE;
+            double lowerbound = 0;
+            double i = (upperbound+lowerbound)/2;
+
+
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2.0);
+                } else {
+                    lowerbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2.0);
+                }
+                //StdOut.println(i);
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_right() {
+        StdRandom.setSeed(42);
+        Neo_Right neo = new Neo_Right();
+        try {
+            // do the tests here!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    public static void main(String[] args) {
+        neo_up_naive();
+        neo_up_bad();
+        neo_up();
+        neo_down();
+        neo_left();
+        neo_right();
+    }
+}
+
+--[ 2019.11.24.18.29.01.735.0 ]--
+InitFile: /src/Neo_Up.java
+public class Neo_Up extends Neo<Integer> {
+    private int N;
+    private int i1;
+
+    public Neo_Up() {
+        N = StdRandom.uniform(1, 1000000);
+        i1 = StdRandom.uniform(N);
+    }
+
+    public int size() {
+        return N;
+    }
+
+    public int get(Integer i) throws Exception {
+        increaseCalls();
+        if(i < 0 || i >= N) throw new IndexOutOfBoundsException();
+        if(i < i1) return 0;
+        return 1;
+    }
+
+    public void found1(Integer i) throws Exception {
+        foundCalled();
+        if(i == i1) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.24.18.29.01.735.1 ]--
+InitFile: /src/Neo_Left.java
+public class Neo_Left extends Neo<Double> {
+    private double d1;
+
+    public Neo_Left() {
+        d1 = StdRandom.uniform(0.0, Double.MAX_VALUE);
+    }
+
+    public int get(Double d) throws Exception {
+        increaseCalls();
+        if(d < d1) return 0;
+        return 1;
+    }
+    public void found1(Double d) throws Exception {
+        this.foundCalled();
+        double diff = Math.floor(d - d1);
+        if(Double.compare(diff, 0.0) == 0) {
+            StdOut.println("Perfect!");
+        } else {
+            StdOut.println("You are off by " + Math.abs(diff));
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.24.18.29.01.735.2 ]--
+InitFile: /src/Neo.java
+public abstract class Neo<ValType> {
+    private int calls = 0;
+    private boolean foundcalled = false;
+
+    protected void increaseCalls() throws Exception {
+        if(foundcalled) throw new Exception("Cannot check after found is called!");
+        calls++;
+    }
+
+    protected void foundCalled() throws Exception {
+        if(foundcalled) throw new Exception("Cannot check after found is called!");
+        foundcalled = true;
+    }
+
+    protected int callsCount() {
+        return calls;
+    }
+
+    public abstract int get(ValType i) throws Exception;
+    public abstract void found1(ValType i) throws Exception;
+}
+
+--[ 2019.11.24.18.29.01.735.3 ]--
+InitFile: /L01_FindTheOne.iml
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="algs4" level="project" />
+    <orderEntry type="library" name="stdlib" level="project" />
+  </component>
+</module>
+
+--[ 2019.11.24.18.29.01.735.4 ]--
+InitFile: /src/Neo_Down.java
+public class Neo_Down extends Neo<Integer> {
+    private int i1;
+
+    public Neo_Down() {
+        i1 = StdRandom.uniform(Integer.MAX_VALUE);
+    }
+
+    public int get(Integer i) throws Exception {
+        increaseCalls();
+        if(i < 0) throw new IndexOutOfBoundsException();
+        if(i < i1) return 0;
+        return 1;
+    }
+
+    public void found1(Integer i) throws Exception {
+        foundCalled();
+        if(i == i1) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.24.18.39.32.140.0 ]--
+DisposeComponent
+--[ 2019.11.25.00.51.41.751.0 ]--
+UpdateTree (AD): 31 0
++ /out/production/L01_FindTheOne/algs4.jar
++ /out/production/L01_FindTheOne/Neo.class
++ /out/production/L01_FindTheOne/stdlib.jar
++ /out/production/L01_FindTheOne/Neo_Up.class
++ /out/production/L01_FindTheOne/Neo_Down.class
++ /out/production/L01_FindTheOne/Neo_Left.class
++ /out/production/L01_FindTheOne/Neo_Right.class
++ /out/production/L01_FindTheOne/FindTheOne.class
++ /src/Neo.java
++ /src/algs4.jar
++ /src/stdlib.jar
++ /src/Neo_Up.java
++ /src/Neo_Down.java
++ /src/Neo_Left.java
++ /src/Neo_Right.java
++ /src/FindTheOne.java
++ /.log/history.log
++ /.idea/copyright/profiles_settings.xml
++ /.idea/libraries/algs4.xml
++ /.idea/libraries/stdlib.xml
++ /.idea/misc.xml
++ /.idea/modules.xml
++ /.idea/compiler.xml
++ /.idea/workspace.xml
++ /.idea/uiDesigner.xml
++ /.idea/description.html
++ /.idea/project-template.xml
++ /.cos265
++ /readme.html
++ /L01_FindTheOne.iml
++ /L01_FindTheOne.zip
+
+--[ 2019.11.25.00.51.41.761.0 ]--
+InitFile: /src/Neo.java
+public abstract class Neo<ValType> {
+    private int calls = 0;
+    private boolean foundcalled = false;
+
+    protected void increaseCalls() throws Exception {
+        if(foundcalled) throw new Exception("Cannot check after found is called!");
+        calls++;
+    }
+
+    protected void foundCalled() throws Exception {
+        if(foundcalled) throw new Exception("Cannot check after found is called!");
+        foundcalled = true;
+    }
+
+    protected int callsCount() {
+        return calls;
+    }
+
+    public abstract int get(ValType i) throws Exception;
+    public abstract void found1(ValType i) throws Exception;
+}
+
+--[ 2019.11.25.00.51.41.770.0 ]--
+InitFile: /src/Neo_Up.java
+public class Neo_Up extends Neo<Integer> {
+    private int N;
+    private int i1;
+
+    public Neo_Up() {
+        N = StdRandom.uniform(1, 1000000);
+        i1 = StdRandom.uniform(N);
+    }
+
+    public int size() {
+        return N;
+    }
+
+    public int get(Integer i) throws Exception {
+        increaseCalls();
+        if(i < 0 || i >= N) throw new IndexOutOfBoundsException();
+        if(i < i1) return 0;
+        return 1;
+    }
+
+    public void found1(Integer i) throws Exception {
+        foundCalled();
+        if(i == i1) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.25.00.51.41.772.0 ]--
+InitFile: /src/Neo_Down.java
+public class Neo_Down extends Neo<Integer> {
+    private int i1;
+
+    public Neo_Down() {
+        i1 = StdRandom.uniform(Integer.MAX_VALUE);
+    }
+
+    public int get(Integer i) throws Exception {
+        increaseCalls();
+        if(i < 0) throw new IndexOutOfBoundsException();
+        if(i < i1) return 0;
+        return 1;
+    }
+
+    public void found1(Integer i) throws Exception {
+        foundCalled();
+        if(i == i1) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.25.00.51.41.774.0 ]--
+InitFile: /src/Neo_Left.java
+public class Neo_Left extends Neo<Double> {
+    private double d1;
+
+    public Neo_Left() {
+        d1 = StdRandom.uniform(0.0, Double.MAX_VALUE);
+    }
+
+    public int get(Double d) throws Exception {
+        increaseCalls();
+        if(d < d1) return 0;
+        return 1;
+    }
+    public void found1(Double d) throws Exception {
+        this.foundCalled();
+        double diff = Math.floor(d - d1);
+        if(Double.compare(diff, 0.0) == 0) {
+            StdOut.println("Perfect!");
+        } else {
+            StdOut.println("You are off by " + Math.abs(diff));
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.25.00.51.41.776.0 ]--
+InitFile: /src/Neo_Right.java
+import java.math.BigInteger;
+
+public class Neo_Right extends Neo<BigInteger> {
+    private static final double pStart = 0.9999;
+    private static final double pDecay = 0.9999;
+    private static final BigInteger [] singles = {
+            new BigInteger("0"),
+            new BigInteger("1"),
+            new BigInteger("2"),
+            new BigInteger("3"),
+            new BigInteger("4"),
+            new BigInteger("5"),
+            new BigInteger("6"),
+            new BigInteger("7"),
+            new BigInteger("8"),
+            new BigInteger("9"),
+    };
+
+    private BigInteger i1 = BigInteger.ZERO;
+
+    public Neo_Right() {
+        for(double p = pStart; StdRandom.uniform() < p; p *= pDecay) {
+            i1 = i1.multiply(BigInteger.TEN).add(singles[StdRandom.uniform(10)]);
+        }
+        if(StdRandom.uniform() < 0.5) i1 = i1.negate();
+    }
+
+    public int get(BigInteger i) throws Exception {
+        increaseCalls();
+        if(i.compareTo(i1) < 0) return 0;
+        return 1;
+    }
+
+    public void found1(BigInteger i) throws Exception {
+        foundCalled();
+        if(i.equals(i1)) {
+            StdOut.println("Congratulations!");
+        } else {
+            StdOut.println("Too bad");
+        }
+        StdOut.println("You called get() " + this.callsCount() + " times");
+    }
+}
+
+--[ 2019.11.25.00.51.41.779.0 ]--
+InitFile: /src/FindTheOne.java
+import java.math.BigInteger;
+
+public class FindTheOne {
+    private static void neo_up_naive() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            int i = 0;
+            while(neo.get(i) == 0) i++; // keep incrementing until
+                                        // we find the first 1!
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_up_bad() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            neo.found1(0);  // this is not the correct position!
+            neo.found1(0);  // this is will throw an exception!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_up() {
+        StdRandom.setSeed(42);
+        Neo_Up neo = new Neo_Up();
+        try {
+            int i = neo.size()/2;
+            int upperbound = neo.size();
+            int lowerbound = 0;
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = (lowerbound+upperbound)/2;
+                } else {
+                    lowerbound = i;
+                    i = (lowerbound+upperbound)/2;
+                }
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_down() {
+        StdRandom.setSeed(42);
+        Neo_Down neo = new Neo_Down();
+        try {
+
+            int upperbound = Integer.MAX_VALUE;
+            int lowerbound = 0;
+            int i = (upperbound+lowerbound)/2;
+
+
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2);
+                } else {
+                    lowerbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2);
+                }
+                //StdOut.println(i);
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_left() {
+        StdRandom.setSeed(42);
+        Neo_Left neo = new Neo_Left();
+        try {
+            double upperbound = Double.MAX_VALUE;
+            double lowerbound = 0;
+            double i = (upperbound+lowerbound)/2;
+
+
+            while(neo.get(i) == 0 || neo.get(i-1) == 1){
+
+                if (neo.get(i) == 1){
+                    upperbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2.0);
+                } else {
+                    lowerbound = i;
+                    i = lowerbound+((upperbound-lowerbound)/2.0);
+                }
+                //StdOut.println(i);
+            }
+            neo.found1(i);
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    private static void neo_right() {
+        StdRandom.setSeed(42);
+        Neo_Right neo = new Neo_Right();
+        try {
+            // do the tests here!
+        } catch(Exception e) {
+            StdOut.println("Caught exception: " + e);
+        }
+    }
+
+    public static void main(String[] args) {
+        neo_up_naive();
+        neo_up_bad();
+        neo_up();
+        neo_down();
+        neo_left();
+        neo_right();
+    }
+}
+
+--[ 2019.11.25.00.51.41.781.0 ]--
+InitFile: /.cos265
+
+
+--[ 2019.11.25.00.51.41.782.0 ]--
+InitFile: /L01_FindTheOne.iml
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="algs4" level="project" />
+    <orderEntry type="library" name="stdlib" level="project" />
+  </component>
+</module>
+
+--[ 2019.11.25.19.03.46.396.0 ]--
+DisposeComponent
